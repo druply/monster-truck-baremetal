@@ -1,0 +1,100 @@
+#include <cmath>
+#include <iostream>
+
+// State
+struct State {
+    double x = 0.0;    // global X (m)
+    double y = 0.0;    // global Y (m)
+    double vx = 0.0;   // global Vx (m/s)
+    double vy = 0.0;   // global Vy (m/s)
+};
+
+// Update function: one timestep
+// ax, ay: accelerations in body frame (m/s^2)
+// delta: timestep (s)
+// encoder_distance: distance travelled forward during this timestep (m)
+// heading: vehicle heading (global yaw) in radians (0 = x axis)
+void updateStep(State &s,
+                double ax, double ay,
+                double delta,
+                double encoder_distance,
+                double heading)
+{
+    if (delta <= 0.0) return;
+
+    // Rotate accel from body to global frame: R(heading) * [ax; ay]
+    double c = std::cos(heading);
+    double si = std::sin(heading);
+    double ax_g = ax * c - ay * si;
+    double ay_g = ax * si + ay * c;
+
+    // Integrate acceleration -> velocity (simple Euler)
+    double vx_pred = s.vx + ax_g * delta;
+    double vy_pred = s.vy + ay_g * delta;
+
+    // Project predicted velocity onto forward (heading) and lateral directions
+    double ux = c;           // forward unit vector x
+    double uy = si;          // forward unit vector y
+    double vx_forward = vx_pred * ux + vy_pred * uy;               // scalar forward speed
+    double vx_lateral  = -vx_pred * uy + vy_pred * ux;             // scalar lateral speed (right-positive)
+
+    // Encoder gives forward displacement over the timestep: Δs = encoder_distance
+    double v_enc_forward = encoder_distance / delta; // forward speed from encoder
+
+    // Replace forward component with encoder (α = 1). For blending use alpha in (0,1)
+    double v_fused_forward = v_enc_forward;
+
+    // Reconstruct fused global velocities
+    double vx_fused = v_fused_forward * ux - vx_lateral * uy;
+    double vy_fused = v_fused_forward * uy + vx_lateral * ux;
+
+    // Update state velocities
+    s.vx = vx_fused;
+    s.vy = vy_fused;
+
+    // Update position: use encoder-derived forward displacement for along-track change
+    // Compute forward displacement vector
+    double dx_forward = encoder_distance * ux;
+    double dy_forward = encoder_distance * uy;
+
+    // Estimate lateral displacement over this timestep from lateral speed
+    double lateral_disp = vx_lateral * delta; // small lateral displacement (approx)
+    // lateral unit (to the right) is [-sin, cos]
+    double dx_lateral = lateral_disp * (-si);
+    double dy_lateral = lateral_disp * c;
+
+    // Apply position update: encoder for forward + accel-derived lateral
+    s.x += dx_forward + dx_lateral;
+    s.y += dy_forward + dy_lateral;
+}
+
+// Small demo
+int main() {
+    State s;
+
+    // Example inputs for 10 steps
+    double dt = 0.01; // 10 ms
+    // simulate constant forward acceleration in body frame (e.g., ax = 0.5 m/s^2 forward)
+    double ax_body = 0.5;
+    double ay_body = 0.0;
+
+    // initial heading (radians)
+    double heading = 0.1; // small yaw
+
+    for (int k = 0; k < 100; ++k) {
+        // Suppose encoder measures distance for this dt; here we derive it from true motion
+        // For demo, compute an example encoder_distance assuming small constant speed increasing:
+        // (In real use, encoder_distance comes from ticks)
+        double encoder_distance = (s.vx * std::cos(heading) + s.vy * std::sin(heading)) * dt
+                                  + 0.5 * ax_body * dt * dt; // example; replace with real sensor
+
+        updateStep(s, ax_body, ay_body, dt, encoder_distance, heading);
+
+        if (k % 10 == 0) {
+            std::cout << "t=" << (k+1)*dt
+                      << " x=" << s.x << " y=" << s.y
+                      << " vx=" << s.vx << " vy=" << s.vy << "\n";
+        }
+    }
+    return 0;
+}

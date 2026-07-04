@@ -1,0 +1,22 @@
+# create service
+# sudo nano /etc/systemd/system/pca9685-init.service
+#Reload the systemd daemon: 
+#sudo systemctl daemon-reload.
+
+#Enable the service: 
+#sudo systemctl enable pca9685-init.service.
+
+#Start it now to test: 
+#sudo systemctl start pca9685-init.service. 
+
+[Unit]
+Description=Initialize PCA9685 PWM Channels
+After=multi-user.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/pca9685-init.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
