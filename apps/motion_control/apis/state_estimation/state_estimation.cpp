@@ -129,9 +129,9 @@ void StateEstimation::run(void) noexcept {
 
         ImuData data = imu.getImuData();
 
-        // std::cout << "acc: " << data.ax << ", " << data.ay << ", " << data.az << std::endl; 
-        // std::cout << "gyro: " << data.gx << ", "<< data.gy << ", "<< data.gz << std::endl; 
-        // std::cout << "heading: " << data.heading << std::endl; 
+        std::cout << "acc: " << data.ax << ", " << data.ay << ", " << data.az << std::endl; 
+        std::cout << "gyro: " << data.gx << ", "<< data.gy << ", "<< data.gz << std::endl; 
+        std::cout << "heading: " << data.heading << std::endl; 
         //std::cout << "heading offset: " << (heading_angle_offset) << std::endl; 
         //std::cout << "heading total: " << (data.heading - heading_angle_offset) << std::endl; 
 
@@ -140,8 +140,8 @@ void StateEstimation::run(void) noexcept {
         float ax_world = data.ax * std::cos(heading_rads) - data.ay*std::sin(heading_rads);
         float ay_world = data.ax * std::sin(heading_rads) + data.ay*std::cos(heading_rads);
 
-        // std:: cout << "ax_world " << ax_world << std::endl;
-        // std:: cout << "ay_world " << ay_world << std::endl;
+        std:: cout << "ax_world " << ax_world << std::endl;
+        std:: cout << "ay_world " << ay_world << std::endl;
 
         static float prev_vx_imu{0.0f};
         static float prev_vy_imu{0.0f};
@@ -149,16 +149,18 @@ void StateEstimation::run(void) noexcept {
         //std:: cout << "delta_time_s  " << std::to_string(delta_time_s) << std::endl;
         float vx_imu = prev_vx_imu + ax_world*(delta_time_s);
         float vy_imu = prev_vy_imu + ay_world*(delta_time_s);
-        prev_vx_imu = vx_imu;
-        prev_vy_imu = vy_imu;
-        //std:: cout << "vx_imu " << ay_world << std::endl;
-        //std:: cout << "vy_imu " << vy_imu << std::endl;
+        
+
+        std:: cout << "vx_imu " << ay_world << std::endl;
+        std:: cout << "vy_imu " << vy_imu << std::endl;
 
         float dx_imu = prev_vx_imu*delta_time_s + (ax_world*(delta_time_s*delta_time_s))/2.0f;
         float dy_imu = prev_vy_imu*delta_time_s + (ay_world*(delta_time_s*delta_time_s))/2.0f;
-        // std:: cout << "dx_imu " << dx_imu << std::endl;
-        // std:: cout << "dy_imu " << dy_imu << std::endl;
+        std:: cout << "dx_imu " << dx_imu << std::endl;
+        std:: cout << "dy_imu " << dy_imu << std::endl;
 
+        prev_vx_imu = vx_imu;
+        prev_vy_imu = vy_imu;
         // if car is not moving then dont calculate anything
         if (encoder_velocity == 0.0) {
             dx_imu = 0.0;
@@ -170,22 +172,22 @@ void StateEstimation::run(void) noexcept {
         float dx_encoder = encoder_delta_distance*std::cos(heading_rads);
         float dy_encoder = encoder_delta_distance*std::sin(heading_rads);
 
-        // std:: cout << "dx_encoder " << dx_encoder << std::endl;
-        // std:: cout << "dy_encoder " << dy_encoder << std::endl;
+        std:: cout << "dx_encoder " << dx_encoder << std::endl;
+        std:: cout << "dy_encoder " << dy_encoder << std::endl;
 
         float vx_encoder = encoder_velocity*std::cos(heading_rads);
         float vy_encoder = encoder_velocity*std::sin(heading_rads);
 
-        // std:: cout << "vx_encoder " << vx_encoder << std::endl;
-        // std:: cout << "vy_encoder " << vy_encoder << std::endl;
+        std:: cout << "vx_encoder " << vx_encoder << std::endl;
+        std:: cout << "vy_encoder " << vy_encoder << std::endl;
 
         const float alpha = 0.8;
         float vx_total = alpha*vx_encoder + (1-alpha)*vx_imu;
         float vy_total = alpha*vy_encoder + (1-alpha)*vy_imu;
         float dx_delta = alpha*dx_encoder + (1-alpha)*dx_imu;
         float dy_delta = alpha*dy_encoder + (1-alpha)*dy_imu;
-        // std:: cout << "dx_delta " << dx_delta << std::endl;
-        // std:: cout << "dy_delta " << dy_delta << std::endl;
+        std:: cout << "dx_delta " << dx_delta << std::endl;
+        std:: cout << "dy_delta " << dy_delta << std::endl;
 
 
         static float prev_x_total{0.0f};

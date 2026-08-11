@@ -264,13 +264,14 @@ constexpr float pi_f = std::numbers::pi_v<float>;
 
 static void setSteering(float steering){
     float local_steer{0.0};
-    local_steer = (-1.0f*steering*180.0)/pi_f;
+    local_steer = (steering*180.0)/pi_f;
     std::cout << "steering angle: " << local_steer << std::endl;
-    motors.setSteeringAngle(local_steer);
+    //motors.setSteeringAngle(local_steer);
+    motors.setSteeringAngle(0.0);
 }
 
 static void setVelocity(float velocity){
-    motors.setMotorsPwm(0.7);
+    motors.setMotorsPwm(1.0);
 }
 
 int main() {
@@ -286,7 +287,7 @@ int main() {
 
     // Initialize the vector with the CSV data
     // short test
-    /*
+    
     std::vector<TrajectoryPoint> trajectory = {
         {0.0f,  0.0f,  1.0f},
         {0.2f,  0.0f,  1.0f},
@@ -308,7 +309,8 @@ int main() {
         // {3.4f,  0.7f,  1.0f},
         // {3.6f,  0.7f,  1.0f},
     };
-    */
+    
+    /*
 
      std::vector<TrajectoryPoint> trajectory = {
         {0.0f, 0.0f, 0.0f},
@@ -337,52 +339,59 @@ int main() {
         {4.6f, 0.0f, 1.0f},
         {4.8f, 0.0f, 1.0f},
         {5.0f, 0.0f, 1.0f},
-        {5.13f, -0.01f, 0.8f},
-        {5.25f, -0.02f, 0.8f},
-        {5.38f, -0.05f, 0.8f},
-        {5.50f, -0.09f, 0.8f},
-        {5.62f, -0.13f, 0.8f},
-        {5.73f, -0.19f, 0.8f},
-        {5.84f, -0.26f, 0.8f},
-        {5.94f, -0.33f, 0.8f},
-        {6.04f, -0.42f, 0.8f},
-        {6.50f, -0.68f, 0.8f},
-        {6.61f, -0.81f, 0.8f},
-        {6.70f, -0.95f, 0.8f},
-        {6.83f, -0.95f, 0.8f},
-        {6.96f, -0.95f, 0.8f},
-        {7.08f, -0.95f, 1.0f},
-        {7.28f, -0.95f, 1.0f},
-        {7.48f, -0.95f, 1.0f},
-        {7.68f, -0.95f, 1.0f},
-        {7.88f, -0.95f, 1.0f},
-        {8.08f, -0.95f, 1.0f},
-        {8.28f, -0.95f, 1.0f},
-        {8.48f, -0.95f, 1.0f},
-        {8.68f, -0.95f, 1.0f},
-        {8.88f, -0.95f, 1.0f},
-        {9.08f, -0.95f, 0.5f},
-        {9.28f, -0.95f, 0.0f},
-        {9.48f, -0.95f, 0.0f}
+        {5.13f, 0.01f, 0.8f},
+        {5.25f, 0.02f, 0.8f},
+        {5.38f, 0.05f, 0.8f},
+        {5.50f, 0.09f, 0.8f},
+        {5.62f, 0.13f, 0.8f},
+        {5.73f, 0.19f, 0.8f},
+        {5.84f, 0.26f, 0.8f},
+        {5.94f, 0.33f, 0.8f},
+        {6.04f, 0.42f, 0.8f},
+        {6.50f, 0.68f, 0.8f},
+        {6.61f, 0.81f, 0.8f},
+        {6.70f, 0.95f, 0.8f},
+        {6.83f, 0.95f, 0.8f},
+        {6.96f, 0.95f, 0.8f},
+        {7.08f, 0.95f, 1.0f},
+        {7.28f, 0.95f, 1.0f},
+        {7.48f, 0.95f, 1.0f},
+        {7.68f, 0.95f, 1.0f},
+        {7.88f, 0.95f, 1.0f},
+        {8.08f, 0.95f, 1.0f},
+        {8.28f, 0.95f, 1.0f},
+        {8.48f, 0.95f, 1.0f},
+        {8.68f, 0.95f, 1.0f},
+        {8.88f, 0.95f, 1.0f},
+        {9.08f, 0.95f, 0.5f},
+        {9.28f, 0.95f, 0.0f},
+        {9.48f, 0.95f, 0.0f}
     };
+*/
+
+   // let filters stabilize
+    for(int i=0; i< 500; i++) {
+        state.run();
+    }
 
     traj_follower.setTrajectory(trajectory);
 
     while(true) {
+
         state.run();
         State_t m_state = state.getState();
         CarState car_state;
         car_state.x = m_state.x;
         car_state.y = m_state.y;
-        car_state.theta = (m_state.heading*pi_f)/180.0f;
+        car_state.theta = (m_state.heading*pi_f)/180.0f; // convert deg to rads
 
         traj_follower.setCarState(car_state);
         traj_follower.run();
         auto [steering, velocity] = traj_follower.getControlVariables();
-        setSteering(steering);
-        setVelocity(velocity);
+        //setSteering(steering);
+        //setVelocity(velocity);
 
-        std::cout << "steering: " << steering << std::endl;
+        std::cout << "clamped steering: " << steering << std::endl;
         std::cout << "target velocity: " << velocity << std::endl;
         std::cout << "x: " << m_state.x << std::endl;
         std::cout << "y: " << m_state.y << std::endl;
@@ -391,11 +400,13 @@ int main() {
         std::cout << "heading: " << m_state.heading << std::endl;
         std::cout << "distance: " << m_state.distance << std::endl;
 
+        std::cout << "Processing data..." << std::flush;
+
         // if (m_state.x > 1.0) {
         //     motors.setSteeringAngle(-20.0);
         // }
 
-        if (m_state.x > 9.4) {
+        if (m_state.x > 2.7) {
             break;
         }
 

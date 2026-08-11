@@ -3,6 +3,7 @@
 #include <cmath>
 #include "trajectory_type.hpp"
 #include <algorithm> 
+#include <iostream>
 
 class PurePursuitController {
 private:
@@ -39,10 +40,17 @@ public:
         // 1. Transform target point to the car's local coordinate system
         float dx = target_pt.x - car.x;
         float dy = target_pt.y - car.y;
-        
+        std::cout << "dx: " << dx << std::endl;
+        std::cout << "dy: " << dy << std::endl;
+        // if delta is too small then return last value
+        if ((dy>0.09f) || (dy<-0.09f)) {
+             return {last_steering_angle_, target_pt.v};
+        }
         // Local Y coordinate (positive to the left of the car)
         float local_y = -dx * std::sin(car.theta) + dy * std::cos(car.theta);
         float local_x = dx * std::cos(car.theta) + dy * std::sin(car.theta);
+        std::cout << "local_y: " << local_y << std::endl;
+        std::cout << "local_x: " << local_x << std::endl;
         // CORRECTED: Flipped signs to make Y-positive point RIGHT instead of LEFT
         //float local_y = dx * std::sin(car.theta) - dy * std::cos(car.theta);
 
@@ -52,7 +60,9 @@ public:
         //                                    look_ahead_distance_ * look_ahead_distance_);
 
         float alpha = std::atan2(local_y,local_x);
+        std::cout << "alpha: " << alpha << std::endl;
         float steering_angle = std::atan2(2*wheelbase_*std::sin(alpha), look_ahead_distance_);
+        std::cout << "raw steering_angle: " << steering_angle << std::endl;
         // 3. Longitudinal control (simple velocity pass-through or error-based)
         float target_velocity = target_pt.v;
         

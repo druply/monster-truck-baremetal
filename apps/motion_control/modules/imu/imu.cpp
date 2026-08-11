@@ -437,12 +437,12 @@ void Imu::run(void) noexcept{
 
             // 1. Map to a standard right-handed NED-aligned coordinate frame
             float ax = -filtered_accel[0];
-            float ay =  filtered_accel[1];
-            float az = -filtered_accel[2];
+            float ay =  -filtered_accel[1];
+            float az = filtered_accel[2];
 
             float mx = -filtered_mag[0];
-            float my =  filtered_mag[1];
-            float mz = -filtered_mag[2];
+            float my =  -filtered_mag[1];
+            float mz = filtered_mag[2];
 
 
             //update imu data
@@ -451,26 +451,26 @@ void Imu::run(void) noexcept{
             filtered_data.az = az;
 
             filtered_data.gx = -filtered_gyro[0];
-            filtered_data.gy = filtered_gyro[1];
-            filtered_data.gz = -filtered_gyro[2];
+            filtered_data.gy = -filtered_gyro[1];
+            filtered_data.gz = filtered_gyro[2];
 
 
             filtered_data.mx = mx;
             filtered_data.my = my;
             filtered_data.mz = mz;
 
-            // std::cout << "imu ax: " << filtered_data.ax << std::endl;
-            // std::cout << "imu ay: " << filtered_data.ay << std::endl;
-            // std::cout << "imu az: " << filtered_data.az << std::endl;
+            std::cout << "imu ax: " << filtered_data.ax << std::endl;
+            std::cout << "imu ay: " << filtered_data.ay << std::endl;
+            std::cout << "imu az: " << filtered_data.az << std::endl;
 
-            // std::cout << "imu gx: " << filtered_data.gx << std::endl;
-            // std::cout << "imu gy: " << filtered_data.gy << std::endl;
-            // std::cout << "imu gz: " << filtered_data.gz << std::endl;
+            std::cout << "imu gx: " << filtered_data.gx << std::endl;
+            std::cout << "imu gy: " << filtered_data.gy << std::endl;
+            std::cout << "imu gz: " << filtered_data.gz << std::endl;
 
             
-            // std::cout << "imu mx: " << filtered_data.mx << std::endl;
-            // std::cout << "imu my: " << filtered_data.my << std::endl;
-            // std::cout << "imu mz: " << filtered_data.mz << std::endl;
+            std::cout << "imu mx: " << filtered_data.mx << std::endl;
+            std::cout << "imu my: " << filtered_data.my << std::endl;
+            std::cout << "imu mz: " << filtered_data.mz << std::endl;
 
             // 2. Calculate tilt compensation (Roll and Pitch)
             // Roll (phi) around the new X axis
@@ -491,16 +491,17 @@ void Imu::run(void) noexcept{
 
             // 4. Calculate heading and adjust for declination
             // Negating magy converts the counter-clockwise atan2 output to clockwise heading
-            heading_raw = atan2(-magy, magx) * 180.0f / pi_f;
+            heading_raw = atan2(magy, magx) * 180.0f / pi_f;
 
             // Shift the reference frame by -90 degrees so 0 points North instead of East
             //heading_raw += 90.0f; 
 
             // Wrap heading to a standard 0 to 360 degrees range
             heading_raw += DECLINATION;
-            if (heading_raw < 0.0f)   heading_raw += 360.0f;
-            if (heading_raw >= 360.0f) heading_raw -= 360.0f;
-            //std::cout << "heading_raw: " << heading_raw << std::endl;
+            heading_raw += 10.0; // offset
+            // if (heading_raw < 0.0f)   heading_raw += 360.0f;
+            // if (heading_raw >= 360.0f) heading_raw -= 360.0f;
+            std::cout << "heading_raw: " << heading_raw << std::endl;
             // // 3. Tilt Compensation
             // roll_raw = atan2(filtered_data.ay, filtered_data.az);
             // pitch_raw = atan2(-filtered_data.ax, sqrt(filtered_data.ay*filtered_data.ay + filtered_data.az*filtered_data.az));
@@ -523,6 +524,7 @@ void Imu::run(void) noexcept{
             // calculate heading fusing with gyro
             filtered_data.heading = HEADING_ALPHA_FACTOR_FUSED*( filtered_data.heading + (filtered_data.gz*delta_time_s) ) + (1.0 - HEADING_ALPHA_FACTOR_FUSED)*heading_raw;
 
+        
             // set the first run to false only at the end of the first cycle
             if (_first_run) {
                    _first_run = false;

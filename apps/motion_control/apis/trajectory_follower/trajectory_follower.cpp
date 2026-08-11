@@ -3,7 +3,7 @@
 #include "apis/state_estimation/state_estimation.hpp"
 
 
-// Initialize controller: Look-ahead = 1.0m, Wheelbase = 0.25m (typical 1/10 RC scale)
+// Initialize controller: Look-ahead = 0.2m, Wheelbase = 0.35m (typical 1/10 RC scale)
 static PurePursuitController controller{0.2, 0.35};
 
 TrajectoryFollower::TrajectoryFollower() {}
