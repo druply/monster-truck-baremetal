@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ModuleType.hpp"
+#include "IEncoders.hpp"
 #include <thread>
 #include <chrono>
 #include <atomic>
@@ -8,7 +9,7 @@
 
 class IMessageBroker;
 
-class Encoders : public ModuleType{
+class Encoders : public ModuleType, public IEncoders {
 	
     // Define the implementation struct inline
     struct Impl {
@@ -41,8 +42,8 @@ public:
     void run(void) noexcept override;
     void deInit(void) noexcept override;
 // Non-blocking real-time data accessors using atomic loads
-    int64_t get_left_pulses() const noexcept { return m_impl.m_right_encoder.load(std::memory_order_acquire); }
-    int64_t get_right_pulses() const noexcept { return m_impl.m_left_encoder.load(std::memory_order_acquire); }
+    int64_t get_left_pulses() const noexcept override { return m_impl.m_right_encoder.load(std::memory_order_acquire); }
+    int64_t get_right_pulses() const noexcept override { return m_impl.m_left_encoder.load(std::memory_order_acquire); }
 private:
     Impl m_impl;  // Now stored on the stack
     

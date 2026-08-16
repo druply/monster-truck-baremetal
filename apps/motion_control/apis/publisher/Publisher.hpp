@@ -1,4 +1,5 @@
 #include "ModuleType.hpp"
+#include <thread>
 #include "modules/encoders/encoders.hpp"
 #include "modules/motors/motors.hpp"
 #include "modules/imu/imu.hpp"
@@ -7,6 +8,7 @@ class Publisher: public ModuleType {
     Encoders& _encoders;
     Imu& _imu;
     Motors& _motors;
+    void worker(std::stop_token stoken);
 
     public:
         explicit Publisher(Encoders& encoders, Imu& imu, Motors& motors) noexcept;

@@ -25,7 +25,7 @@ static Publisher publisher{encoders,imu,motors};
 
 
 int main() {
-
+    // Initialize modules
     motors.init();
     encoders.init();
     imu.init(); 
@@ -36,8 +36,12 @@ int main() {
     motors.setSteeringAngle(0.0);
 
 
-        motors.setMotorsPwm(0.0);
-        motors.deInit();
+    // deinit modules
+    motors.setMotorsPwm(0.0);
+    motors.deInit();
+    encoders.deInit();
+    imu.deInit();
+    publisher.deInit();
     return 0;
 
 }

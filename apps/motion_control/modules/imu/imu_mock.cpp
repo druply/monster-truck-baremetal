@@ -1,29 +1,31 @@
-#include "mpu9250.hpp"
-#include "axis_struct.hpp"
+#include "imu.hpp"
+#include <iostream>
 
-using namespace mpu9250;
-
-std::optional<AllAxes> MPU9250::read_all() {
- AllAxes out;
-
- out.ax = 0.5;
- out.ay = 0.5;
- out.az = 9.8;
- 
- return out;
+Imu::Imu() : accel_filter(0.1), gyro_filter(0.1), mag_filter(0.1) {
 }
 
-std::error_code MPU9250::initialize() {
+Imu::~Imu() = default;
 
-    return std::error_code(); // success
+std::error_code Imu::initialize() {
+    return {};
 }
 
-MPU9250::~MPU9250() { close(); }
+void Imu::close() {
+}
 
-MPU9250::MPU9250(const Config& cfg) : cfg_(cfg) {}
+void Imu::deInit(void) noexcept {
+}
 
+void Imu::run(void) noexcept {
+}
 
+void Imu::init(void) noexcept {
+    const auto ec = initialize();
+    if (ec) {
+        std::cerr << "Imu mock init failed: " << ec.message() << " (code " << ec.value() << ")\n";
+    }
+}
 
-void MPU9250::close() {
-
+void Imu::read_all_axis(void) {
+    filtered_data = ImuData{0};
 }

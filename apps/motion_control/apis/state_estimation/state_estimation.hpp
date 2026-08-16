@@ -1,7 +1,11 @@
 #pragma once
 
 #include "ModuleType.hpp"
+#include "IEncoders.hpp"
 #include <memory>
+#include "modules/encoders/encoders.hpp"
+#include "modules/motors/motors.hpp"
+#include "modules/imu/imu.hpp"
 
 // State
 struct State_t {
@@ -17,9 +21,12 @@ struct State_t {
 class StateEstimation: public ModuleType {
 
     State_t m_state{0.0};
+    IEncoders& ecdrs;
+    Imu& imu;
+
   
     public:
-        explicit StateEstimation() noexcept;
+        explicit StateEstimation(IEncoders& encoders, Imu& imu_in) noexcept;
         ~StateEstimation();        
         void init(void) noexcept override;
 		void run(void) noexcept override;

@@ -79,4 +79,4 @@ add_subdirectory ("apps/motion_control")
 #add_subdirectory ("modules/imu")
 #add_subdirectory ("modules/motors")
 
-#target_link_libraries(Robot PRIVATE Encoders)
+#target_link_libraries(Robot PRIVATE Encoders Motors IMU)

@@ -22,10 +22,8 @@ constexpr float pi_f = std::numbers::pi_v<float>;
 constexpr float DISTANCE_PP = ((pi_f*TIRE_DIAMETER)/PULSES_PER_ROTATION); // distance per tick in meters
 
 // create encoders
-static Encoders ecdrs{};
-static Imu imu{};
 
- StateEstimation::StateEstimation() noexcept {
+ StateEstimation::StateEstimation(IEncoders& encoders, Imu& imu_in)noexcept :  ecdrs(encoders), imu(imu_in)  {
 
 }
 
@@ -35,36 +33,6 @@ StateEstimation::~StateEstimation(){
 
 void StateEstimation::init(void) noexcept {
 
-    ImuData data;
-    //std::array<float, 11> heading_median_arr{0};
-    std::error_code ec = imu.initialize();
-
-    if (ec)
-    {
-        std::cerr << "MPU9250 init failed: " << ec.message() << " (code " << ec.value() << ")\n";
-        //return 1;
-    }
-    else {
-        ecdrs.init();
-
-        m_state.distance = 0.0f;
-        m_state.x = 0.0f;
-        m_state.y = 0.0f;
-        m_state.heading = 0.0f;
-        m_state.vx = 0.0f;
-        m_state.vy = 0.0f;
-        // let imu statbilize
-        for(int i = 0; i < 11; i++) {
-             imu.read_all_axis();
-             data = imu.getImuData();
-        //     heading_median_arr.at(i) = data.heading;
-             std::this_thread::sleep_for(std::chrono::milliseconds(20));
-        }
-
-        // std::ranges::sort(heading_median_arr); 
-        // heading_angle_offset = heading_median_arr[5];
-
-    }
 }
 
 void StateEstimation::run(void) noexcept {
@@ -213,6 +181,5 @@ void StateEstimation::run(void) noexcept {
 }
 
 void StateEstimation::deInit(void) noexcept {
-    imu.deInit();
-    ecdrs.deInit();
+    
 }

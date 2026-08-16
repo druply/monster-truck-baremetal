@@ -1,6 +1,5 @@
 #include "state_estimation.hpp"
-#include "modules/encoders/encoders.hpp"
-#include "modules/imu/imu.hpp"
+
 #include "modules/imu/axis_struct.hpp"
 #include <cerrno>
 #include <iostream>
@@ -51,8 +50,7 @@ std::vector<State_t> states ={
         {2.5f,  0.9f, 0.5f, 0.0f, 0.0f, 0.0f},
     };
 
- StateEstimation::StateEstimation() noexcept {
-
+StateEstimation::StateEstimation(IEncoders& encoders, Imu& imu_in)noexcept :  ecdrs(encoders), imu(imu_in) {
 }
 
 StateEstimation::~StateEstimation(){
