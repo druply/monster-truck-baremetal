@@ -18,7 +18,9 @@ void Publisher::init(void) noexcept {
 }
 
 void Publisher::run(void) noexcept {
+    std::cout << "[Publisher] run" << std::endl;
 }
 
 void Publisher::deInit(void) noexcept {
+    std::cout << "[Publisher] deInit" << std::endl;
 }

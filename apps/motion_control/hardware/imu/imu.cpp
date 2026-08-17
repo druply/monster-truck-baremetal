@@ -361,12 +361,14 @@ Imu::Imu(): accel_filter(ACCEL_ALPHA_FACTOR), gyro_filter(GYRO_ALPHA_FACTOR), ma
 Imu::~Imu(){}
 
 void Imu::deInit(void) noexcept{
-
+std::cout << "[Imu] deInit" << std::endl;
 }
 void Imu::run(void) noexcept{
-
+    std::cout << "[Imu] run" << std::endl;
+    read_all_axis();
 }
  void Imu::init(void) noexcept {
+    std::cout << "[Imu] init" << std::endl;
     auto ec = initialize();
     if (ec)
     {

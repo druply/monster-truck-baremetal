@@ -3,9 +3,9 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/inc)
 
 #libraries
-add_subdirectory ("modules/encoders")
-add_subdirectory ("modules/imu")
-add_subdirectory ("modules/motors")
+add_subdirectory ("hardware/encoders")
+add_subdirectory ("hardware/imu")
+add_subdirectory ("hardware/motors")
 
 add_subdirectory ("apis/state_estimation")
 add_subdirectory ("apis/publisher")

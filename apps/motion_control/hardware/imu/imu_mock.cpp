@@ -14,12 +14,15 @@ void Imu::close() {
 }
 
 void Imu::deInit(void) noexcept {
+    std::cout << "[Imu] deInit" << std::endl;
 }
 
 void Imu::run(void) noexcept {
+    std::cout << "[Imu] run" << std::endl;
 }
 
 void Imu::init(void) noexcept {
+    std::cout << "[Imu] init" << std::endl;
     const auto ec = initialize();
     if (ec) {
         std::cerr << "Imu mock init failed: " << ec.message() << " (code " << ec.value() << ")\n";

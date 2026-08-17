@@ -1,6 +1,6 @@
 #include "state_estimation.hpp"
 
-#include "modules/imu/axis_struct.hpp"
+#include "hardware/imu/axis_struct.hpp"
 #include <cerrno>
 #include <iostream>
 #include <chrono>
@@ -58,11 +58,11 @@ StateEstimation::~StateEstimation(){
 }   
 
 void StateEstimation::init(void) noexcept {
-
+    std::cout << "[StateEstimation] init" << std::endl;
 }
 
 void StateEstimation::run(void) noexcept {
-
+std::cout << "[StateEstimation] run" << std::endl;
     static int ctr{0};
     if (ctr<states.size()) {
 
@@ -82,5 +82,5 @@ void StateEstimation::run(void) noexcept {
 }
 
 void StateEstimation::deInit(void) noexcept {
-
+    std::cout << "[StateEstimation] deInit" << std::endl;
 }

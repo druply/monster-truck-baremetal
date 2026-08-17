@@ -1,8 +1,8 @@
 #include "ModuleType.hpp"
 #include <thread>
-#include "modules/encoders/encoders.hpp"
-#include "modules/motors/motors.hpp"
-#include "modules/imu/imu.hpp"
+#include "hardware/encoders/encoders.hpp"
+#include "hardware/motors/motors.hpp"
+#include "hardware/imu/imu.hpp"
 
 class Publisher: public ModuleType {
     Encoders& _encoders;

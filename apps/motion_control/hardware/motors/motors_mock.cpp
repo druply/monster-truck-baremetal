@@ -20,7 +20,7 @@ void Motors::init(void) noexcept {
     std::cout << "[Motors] init" << std::endl;
 }
 void Motors::run(void) noexcept {
-
+std::cout << "[Motors] run" << std::endl;
 }
 
 void Motors::deInit(void) noexcept {

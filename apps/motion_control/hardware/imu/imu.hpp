@@ -60,7 +60,7 @@ class Imu : public ModuleType{
                 static double monotonic_time_s();
                 static uint64_t monotonic_time_ms();
                 std::optional<AllAxes> read_all();
-               
+               void read_all_axis(void);
 
                 LowPassFilter3D accel_filter;
                 LowPassFilter3D gyro_filter;
@@ -78,7 +78,7 @@ class Imu : public ModuleType{
                 std::error_code initialize() ;
                  ImuData getImuData(void) {return filtered_data;}
 
-                void read_all_axis(void);
+                
                 // Non-copyable, movable
                 Imu(const Imu&) = delete;
                 Imu& operator=(const Imu&) = delete;

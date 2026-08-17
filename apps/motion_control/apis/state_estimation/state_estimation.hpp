@@ -3,9 +3,9 @@
 #include "ModuleType.hpp"
 #include "IEncoders.hpp"
 #include <memory>
-#include "modules/encoders/encoders.hpp"
-#include "modules/motors/motors.hpp"
-#include "modules/imu/imu.hpp"
+#include "hardware/encoders/encoders.hpp"
+#include "hardware/motors/motors.hpp"
+#include "hardware/imu/imu.hpp"
 
 // State
 struct State_t {

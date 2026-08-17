@@ -54,6 +54,7 @@ void Encoders::monitor_encoder_left_thread(void) noexcept {
 
 }
 void Encoders::init(void) noexcept {
+    std::cout << "[Encoders] init" << std::endl;
     // 1. Explicitly set the atomic flag using relaxed ordering (no other threads exist yet)
     m_impl.m_running.store(true, std::memory_order_release);
 
@@ -63,12 +64,14 @@ void Encoders::init(void) noexcept {
 }
 
 void Encoders::run(void) noexcept {
+    std::cout << "[Encoders] run" << std::endl;
     using namespace std::chrono_literals;
     std::this_thread::sleep_for(1s); // sleep 2 seconds
 
 }
 
 void Encoders::deInit(void) noexcept {
+    std::cout << "[Encoders] deInit" << std::endl;
     // Explicitly requesting a stop signals the stop_token and joins the thread.
     // This blocks for a maximum of 10ms (our line.event_wait timeout) and safely exits.
     //m_impl.worker_thread.request_stop();
