@@ -5,7 +5,7 @@ add_library(State STATIC
             )
 else()
 add_library(State STATIC 
-            state_mock.cpp
+            state_estimation.cpp
             )
 endif()
 

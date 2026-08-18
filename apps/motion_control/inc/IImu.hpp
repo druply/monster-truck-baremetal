@@ -6,5 +6,5 @@
 class IImu {
 public:
     virtual ~IImu() = default;
-    virtual std::optional<AllAxes> read_all() = 0;
+    virtual std::optional<AllAxes> read_all(void) = 0;
 };

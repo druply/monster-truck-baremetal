@@ -1,7 +1,7 @@
 #include "state_estimation.hpp"
-#include "modules/encoders/encoders.hpp"
-#include "modules/imu/imu.hpp"
-#include "modules/imu/axis_struct.hpp"
+#include "hardware/encoders/encoders.hpp"
+#include "hardware/imu/imu.hpp"
+#include "imu_types.hpp"
 #include <cerrno>
 #include <iostream>
 #include <chrono>
@@ -92,7 +92,7 @@ void StateEstimation::run(void) noexcept {
         
      
         // let imu read data
-        imu.read_all_axis();
+        //imu.read_all_axis();
 
 
         ImuData data = imu.getImuData();

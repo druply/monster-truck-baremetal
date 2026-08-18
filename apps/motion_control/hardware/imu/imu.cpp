@@ -377,7 +377,7 @@ void Imu::run(void) noexcept{
     }
  }
 
-   void Imu::read_all_axis(void) {
+   void Imu::read_all(void) {
   
     auto data = read_all();
         if (data){

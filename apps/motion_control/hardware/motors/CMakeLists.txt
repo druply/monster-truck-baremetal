@@ -6,7 +6,7 @@ add_library(Motors STATIC
             )
 else()
 add_library(Motors STATIC 
-            motors_mock.cpp
+            motors.cpp
             PWM_mock.cpp
             )
 endif()

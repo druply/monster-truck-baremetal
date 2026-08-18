@@ -2,6 +2,8 @@
 #pragma once
 #include <array>
 
+using Vector3 = std::array<float, 3>;
+
 struct AllAxes {
     // accelerometer in m/s^2
     float ax, ay, az;

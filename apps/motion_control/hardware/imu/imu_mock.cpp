@@ -29,6 +29,6 @@ void Imu::init(void) noexcept {
     }
 }
 
-void Imu::read_all_axis(void) {
+std::optional<AllAxes> Imu::read_all() {
     filtered_data = ImuData{0};
 }

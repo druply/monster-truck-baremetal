@@ -2,7 +2,7 @@
 #include "ModuleType.hpp"
 #include <thread>
 #include <optional>
-#include "axis_struct.hpp"
+#include "IImu.hpp"
 #include "LowPassFilter.hpp"
 
 struct Config {
@@ -25,7 +25,7 @@ struct Config {
 
 class LowPassFilter3D;
 
-class Imu : public ModuleType{
+class Imu : public IImu, public ModuleType{
  
         private:
                 Config cfg_{};
@@ -59,8 +59,8 @@ class Imu : public ModuleType{
                 static int16_t be16(const uint8_t* b);
                 static double monotonic_time_s();
                 static uint64_t monotonic_time_ms();
-                std::optional<AllAxes> read_all();
-               void read_all_axis(void);
+                
+                //void read_all_axis(void);
 
                 LowPassFilter3D accel_filter;
                 LowPassFilter3D gyro_filter;
@@ -77,7 +77,7 @@ class Imu : public ModuleType{
                 void deInit(void) noexcept override;
                 std::error_code initialize() ;
                  ImuData getImuData(void) {return filtered_data;}
-
+                std::optional<AllAxes> read_all(void) override;
                 
                 // Non-copyable, movable
                 Imu(const Imu&) = delete;

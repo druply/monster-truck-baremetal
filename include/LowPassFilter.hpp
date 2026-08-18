@@ -1,5 +1,5 @@
 #pragma once
-#include "axis_struct.hpp"
+#include "imu_types.hpp"
 #include <cstddef> 
 #include <cassert>
 

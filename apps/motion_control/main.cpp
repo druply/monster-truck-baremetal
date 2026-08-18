@@ -15,7 +15,7 @@
 #include <array>
 
 //#include "hardware/imu/imu_calibrator.hpp"
-#include "hardware/imu/axis_struct.hpp"
+#include "imu_types.hpp"
 
 #include <chrono>
 
@@ -39,6 +39,7 @@ int main() {
     // Run modules
     for (auto module : modules) {
         module->run();
+        std::cout << "encoder right: " << encoders.get_right_pulses() << std::endl;
     }
 
 
