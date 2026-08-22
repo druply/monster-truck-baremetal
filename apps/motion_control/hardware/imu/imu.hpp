@@ -2,7 +2,7 @@
 #include "ModuleType.hpp"
 #include <thread>
 #include <optional>
-#include "IImu.hpp"
+#include "imu_types.hpp"
 #include "LowPassFilter.hpp"
 
 struct Config {
@@ -25,7 +25,7 @@ struct Config {
 
 class LowPassFilter3D;
 
-class Imu : public IImu, public ModuleType{
+class Imu {
  
         private:
                 Config cfg_{};
@@ -72,12 +72,12 @@ class Imu : public IImu, public ModuleType{
 	public:
                 Imu();
                 ~Imu();
-                void init(void) noexcept override;
-                void run(void) noexcept override;
-                void deInit(void) noexcept override;
+                void init(void) noexcept;
+                void run(void) noexcept;
+                void deInit(void) noexcept ;
                 std::error_code initialize() ;
-                 ImuData getImuData(void) {return filtered_data;}
-                std::optional<AllAxes> read_all(void) override;
+                ImuData getImuData(void) {return filtered_data;}
+                std::optional<AllAxes> read_all(void) ;
                 
                 // Non-copyable, movable
                 Imu(const Imu&) = delete;

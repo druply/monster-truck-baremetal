@@ -24,30 +24,33 @@ static Encoders encoders;
 static Imu imu;
 static Publisher publisher{encoders,imu,motors};
 
-std::array<ModuleType*, 4> modules = {&motors, &encoders, &imu, &publisher};
 
 int main() {
     // Initialize modules
-    for (auto module : modules) {
-        module->init();
-    }
+    motors.init();
+    encoders.init();
+    imu.init();
+    publisher.init();
     
     motors.setMotorsDirections(MotorsDirection_t::FORWARD);
     motors.setMotorsPwm(1.0);
     motors.setSteeringAngle(0.0);
 
     // Run modules
-    for (auto module : modules) {
-        module->run();
-        std::cout << "encoder right: " << encoders.get_right_pulses() << std::endl;
-    }
+    motors.run();
+    encoders.run();
+    imu.run();
+    publisher.run();
 
 
     // deinit modules
     motors.setMotorsPwm(0.0);
-    for (auto module : modules) {
-        module->deInit();
-    }
+    
+    motors.deInit();
+    encoders.deInit();
+    imu.deInit();
+    publisher.deInit();
+
     return 0;
 
 }
