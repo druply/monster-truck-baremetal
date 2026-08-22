@@ -1,7 +1,7 @@
-/* 
+/*
 This example assumes you already configured the pwm using the service file and enabled the board on /boot/firmware/config.txt
-Since the systemd service has already handled exporting and setting the frequency, 
-your code simply needs to write new values to the duty_cycle file to change brightness or toggle the LED on/off. 
+Since the systemd service has already handled exporting and setting the frequency,
+your code simply needs to write new values to the duty_cycle file to change brightness or toggle the LED on/off.
 
 */
 #include <iostream>
@@ -10,9 +10,11 @@ your code simply needs to write new values to the duty_cycle file to change brig
 #include <thread>
 #include <chrono>
 
-class PWM {
+class PWM
+{
     std::string duty_path;
     unsigned int max_period;
+
 public:
     // channel matches the pwmX index in /sys/class/pwm/pwmchip0/
     PWM(int channel, unsigned int period_ns) noexcept;
@@ -28,7 +30,7 @@ public:
 /*
 int main() {
     // 20,000,000 ns matches the 50Hz set in your systemd service
-    PWMLED led0(0, 20000000); 
+    PWMLED led0(0, 20000000);
 
     std::cout << "Starting LED pattern..." << std::endl;
 

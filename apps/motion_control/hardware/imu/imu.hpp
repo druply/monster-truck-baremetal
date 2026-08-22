@@ -1,14 +1,15 @@
 #pragma once
-#include "ModuleType.hpp"
+
 #include <thread>
 #include <optional>
 #include "imu_types.hpp"
 #include "LowPassFilter.hpp"
 
-struct Config {
-    int i2c_bus = 1;                     // /dev/i2c-<bus>
-    uint8_t mpu_addr = 0x68;             // MPU9250 default
-    bool use_internal_ak8963 = true;     // if false, expects external magnetometer (not used)
+struct Config
+{
+    int i2c_bus = 1;                 // /dev/i2c-<bus>
+    uint8_t mpu_addr = 0x68;         // MPU9250 default
+    bool use_internal_ak8963 = true; // if false, expects external magnetometer (not used)
     // Accelerometer FS: 2,4,8,16 g
     int accel_fsr_g = 16;
     // Gyro FS: 250,500,1000,2000 deg/s
@@ -23,65 +24,61 @@ struct Config {
     int init_delay_ms = 100;
 };
 
-class LowPassFilter3D;
+class Imu
+{
 
-class Imu {
- 
-        private:
-                Config cfg_{};
-                int fd_i2c_ = -1;
-                bool initialized_ = false;
+private:
+    Config cfg_{};
+    int fd_i2c_ = -1;
+    bool initialized_ = false;
 
-                // scale factors computed at init
-                float accel_scale_ = 1.0f; // LSB->m/s^2
-                float gyro_scale_ = 1.0f;  // LSB->deg/s
-                float mag_scale_[3] = {1.0f,1.0f,1.0f}; // uT per LSB
+    // scale factors computed at init
+    float accel_scale_ = 1.0f;                // LSB->m/s^2
+    float gyro_scale_ = 1.0f;                 // LSB->deg/s
+    float mag_scale_[3] = {1.0f, 1.0f, 1.0f}; // uT per LSB
 
-                // raw read helpers
-                bool i2c_write_reg(uint8_t dev_addr, uint8_t reg, uint8_t val);
-                bool i2c_read_regs(uint8_t dev_addr, uint8_t reg, uint8_t* buf, size_t len);
+    // raw read helpers
+    bool i2c_write_reg(uint8_t dev_addr, uint8_t reg, uint8_t val);
+    bool i2c_read_regs(uint8_t dev_addr, uint8_t reg, uint8_t *buf, size_t len);
 
-                
-          
-                void close();
-                // low-level i2c
-                bool open_i2c();
-                void apply_default_config();
-                float accel_fsr_to_scale(int fsr_g);
-                float gyro_fsr_to_scale(int fsr_dps);
+    void close();
+    // low-level i2c
+    bool open_i2c();
+    void apply_default_config();
+    float accel_fsr_to_scale(int fsr_g);
+    float gyro_fsr_to_scale(int fsr_dps);
 
-                // AK8963 helpers
-                bool setup_ak8963();
-                bool read_ak8963_adjustment();
-                bool read_ak8963_raw(int16_t out[3], uint8_t& st1);
+    // AK8963 helpers
+    bool setup_ak8963();
+    bool read_ak8963_adjustment();
+    bool read_ak8963_raw(int16_t out[3], uint8_t &st1);
 
-                // utility
-                static int16_t be16(const uint8_t* b);
-                static double monotonic_time_s();
-                static uint64_t monotonic_time_ms();
-                
-                //void read_all_axis(void);
+    // utility
+    static int16_t be16(const uint8_t *b);
+    static double monotonic_time_s();
+    static uint64_t monotonic_time_ms();
 
-                LowPassFilter3D accel_filter;
-                LowPassFilter3D gyro_filter;
-                LowPassFilter3D mag_filter;
-                ImuData filtered_data{0};
-                bool _first_run{true};
-               
+    // void read_all_axis(void);
 
-	public:
-                Imu();
-                ~Imu();
-                void init(void) noexcept;
-                void run(void) noexcept;
-                void deInit(void) noexcept ;
-                std::error_code initialize() ;
-                ImuData getImuData(void) {return filtered_data;}
-                std::optional<AllAxes> read_all(void) ;
-                
-                // Non-copyable, movable
-                Imu(const Imu&) = delete;
-                Imu& operator=(const Imu&) = delete;
-                Imu(Imu&&) = default;
-                Imu& operator=(Imu&&) = default;
+    LowPassFilter3D accel_filter;
+    LowPassFilter3D gyro_filter;
+    LowPassFilter3D mag_filter;
+    ImuData filtered_data{0};
+    bool _first_run{true};
+
+public:
+    Imu();
+    ~Imu();
+    void init(void) noexcept;
+    void run(void) noexcept;
+    void deInit(void) noexcept;
+    std::error_code initialize();
+    ImuData getImuData(void) { return filtered_data; }
+    std::optional<AllAxes> read_all(void);
+
+    // Non-copyable, movable
+    Imu(const Imu &) = delete;
+    Imu &operator=(const Imu &) = delete;
+    Imu(Imu &&) = default;
+    Imu &operator=(Imu &&) = default;
 };
