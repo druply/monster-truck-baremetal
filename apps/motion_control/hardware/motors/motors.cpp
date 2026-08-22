@@ -20,7 +20,7 @@ void Motors::run(void) noexcept
 
 void Motors::setSteeringAngle(float value)
 {
-
+    _steering_angle = value;
     if (value > MAX_STERRING)
     {
         value = MAX_STERRING;
@@ -38,6 +38,16 @@ void Motors::setSteeringAngle(float value)
     // set duty cycle
     steering_motor.setPWM(duty);
     // pwm.setPWM(STEERING_CHANNEL, 0, local_pwm);
+}
+
+float Motors::getSteeringAngle(void)
+{
+    return _steering_angle;
+}
+
+MotorPwm_t Motors::getMotorsPwm(void)
+{
+    return _motors_pwm;
 }
 
 void Motors::setMotorsDirections(MotorsDirection_t direction)
@@ -60,6 +70,9 @@ void Motors::setMotorsPwm(float value)
     // std::cout << "motors pwm: "<< value << std::endl;
     motor_right.setPWM(value);
     motor_left.setPWM(value);
+
+    _motors_pwm.right = static_cast<int>(value * 100);
+    _motors_pwm.left = static_cast<int>(value * 100);
 }
 
 void Motors::deInit(void) noexcept

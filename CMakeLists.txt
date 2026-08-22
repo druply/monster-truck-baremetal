@@ -24,6 +24,21 @@ find_package(Threads REQUIRED)
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     message(STATUS "Using GCC compiler, adding specific flags.")
     # Add GCC specific options
+    set(BOOST_ROOT /usr/local)
+    set(Boost_INCLUDE_DIR /usr/local/include)
+    set(Boost_LIBRARY_DIR /usr/local/lib)
+
+    if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    link_directories(${Boost_LIBRARY_DIRS})
+    endif()
+
+    # Add custom CMake modules path
+    #list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+    find_library(PAHO_CPP_LIB paho-mqttpp3)
+    find_library(PAHO_C_LIB paho-mqtt3a)
+
+
     if(WIN32)
 	    include_directories("C:\\Poco\\include")
         include_directories("C:\\boost_libraries")
@@ -56,7 +71,7 @@ endif()
 
 include_directories("include")
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 #set(DB2_INCLUDE_PATH "/opt/ibm/db2/V12.1")

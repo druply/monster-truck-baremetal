@@ -27,4 +27,5 @@ target_link_libraries(Publisher
     pthread          # Threading
     ssl              # SSL support (if using SSL)
     crypto           # Crypto library (if using SSL)
+    boost_json
 )

@@ -38,6 +38,7 @@ class Motors
         PWM motor_inb{MOTOR_IN_B, PWM_PERIOD_NS};
         PWM steering_motor{STEERING_CHANNEL, PWM_PERIOD_NS};
         MotorPwm_t _motors_pwm;
+        float _steering_angle;
         // PCA9685Driver pwm{"/dev/i2c-1", 0x40};
 public:
         Motors() noexcept;
@@ -46,6 +47,8 @@ public:
         void run(void) noexcept;
         void deInit(void) noexcept;
         void setSteeringAngle(float value);
+        float getSteeringAngle(void);
+        MotorPwm_t getMotorsPwm(void);
         void setMotorsDirections(MotorsDirection_t direction);
         void setMotorsPwm(float value);
 };

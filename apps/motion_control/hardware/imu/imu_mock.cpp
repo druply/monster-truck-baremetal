@@ -19,6 +19,7 @@ void Imu::deInit(void) noexcept {
 
 void Imu::run(void) noexcept {
     std::cout << "[Imu] run" << std::endl;
+    filtered_data = ImuData{0.2f, 0.4f, 9.81f, 1.3f, 0.73f, 0.1203f, 30.0f, 1.220f, 40.323f, 25.43f, 1};
 }
 
 void Imu::init(void) noexcept {
@@ -30,5 +31,5 @@ void Imu::init(void) noexcept {
 }
 
 std::optional<AllAxes> Imu::read_all() {
-    filtered_data = ImuData{0};
+    filtered_data = ImuData{0.0f, 0.0f, 9.81f, 0.0f, 0.0f, 0.0f, 30.0f, 0.0f, 40.0f, 25.0f, 1};
 }
