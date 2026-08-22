@@ -42,7 +42,7 @@ int main() {
     imu.run();
     publisher.run();
 
-
+    std::this_thread::sleep_for(std::chrono::seconds(10));
     // deinit modules
     motors.setMotorsPwm(0.0);
     
