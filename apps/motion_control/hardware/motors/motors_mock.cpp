@@ -16,21 +16,8 @@ const int MOTOR_IN_A = 2;
 const int MOTOR_IN_B = 3;
 
 
-struct Motors::Impl {
-    // Mock implementation is intentionally minimal.
-        PWM motor_right{REAR_MOTOR_CHANNEL, PWM_PERIOD_NS}; 
-	    PWM motor_left{FRONT_MOTOR_CHANNEL, PWM_PERIOD_NS}; 
-        PWM motor_ina{MOTOR_IN_A, PWM_PERIOD_NS}; 
-        PWM motor_inb{MOTOR_IN_B, PWM_PERIOD_NS}; 
-        PWM steering_motor{STEERING_CHANNEL, PWM_PERIOD_NS}; 
-        MotorPwm_t _motors_pwm;
-            Impl(){
 
- 
-    }
-};
-
-Motors::Motors() noexcept : pimpl(std::make_unique<Impl>()) {
+Motors::Motors() noexcept  {
 
 }
 

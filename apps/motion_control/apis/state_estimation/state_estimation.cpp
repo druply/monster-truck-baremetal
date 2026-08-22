@@ -23,7 +23,7 @@ constexpr float DISTANCE_PP = ((pi_f*TIRE_DIAMETER)/PULSES_PER_ROTATION); // dis
 
 // create encoders
 
- StateEstimation::StateEstimation(IEncoders& encoders, Imu& imu_in)noexcept :  ecdrs(encoders), imu(imu_in)  {
+ StateEstimation::StateEstimation(Encoders& encoders, Imu& imu_in)noexcept :  ecdrs(encoders), imu(imu_in)  {
 
 }
 

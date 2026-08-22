@@ -15,4 +15,4 @@ endif()
 
 target_include_directories(State PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_include_directories(State PRIVATE ${CMAKE_SOURCE_DIR})
-target_link_libraries(State PRIVATE Imu)
+target_link_libraries(State PRIVATE Imu Encoders Motors)

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ModuleType.hpp"
-#include "IEncoders.hpp"
 #include "IStateEstimation.hpp"
+
 #include <memory>
 
 #include "hardware/encoders/encoders.hpp"
@@ -12,11 +12,11 @@
 class StateEstimation: public IStateEstimation, public ModuleType {
 
     State_t m_state{0.0};
-    IEncoders& ecdrs;
+    Encoders& ecdrs;
     Imu& imu;
 
     public:
-        explicit StateEstimation(IEncoders& encoders, Imu& imu_in) noexcept;
+        explicit StateEstimation(Encoders& encoders, Imu& imu_in) noexcept;
         ~StateEstimation();        
         void init(void) noexcept override;
 		void run(void) noexcept override;
