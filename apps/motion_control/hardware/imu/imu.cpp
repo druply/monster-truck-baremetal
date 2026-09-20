@@ -462,7 +462,7 @@ void Imu::init(void) noexcept
     }
 }
 
-void Imu::read_all(void)
+ImuData Imu::getImuData(void)
 {
 
     auto data = read_all();
@@ -617,4 +617,6 @@ void Imu::read_all(void)
             _first_run = false;
         }
     }
+
+     return filtered_data; 
 }

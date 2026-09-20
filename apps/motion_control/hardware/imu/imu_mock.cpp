@@ -22,6 +22,11 @@ void Imu::run(void) noexcept {
     filtered_data = ImuData{0.2f, 0.4f, 9.81f, 1.3f, 0.73f, 0.1203f, 30.0f, 1.220f, 40.323f, 25.43f, 1};
 }
 
+ImuData Imu::getImuData(void)
+{
+    return filtered_data;
+}
+
 void Imu::init(void) noexcept {
     std::cout << "[Imu] init" << std::endl;
     const auto ec = initialize();

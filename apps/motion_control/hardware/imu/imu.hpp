@@ -73,7 +73,7 @@ public:
     void run(void) noexcept;
     void deInit(void) noexcept;
     std::error_code initialize();
-    ImuData getImuData(void) { return filtered_data; }
+    ImuData getImuData(void);
     std::optional<AllAxes> read_all(void);
 
     // Non-copyable, movable
