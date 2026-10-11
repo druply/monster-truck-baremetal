@@ -87,10 +87,10 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utils/Logger)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/database)
 
-#add_executable(Robot main.cpp)
+add_executable(Robot src/main.cpp)
 
 #libraries
-add_subdirectory ("apps/motion_control")
+#add_subdirectory ("apps/motion_control")
 #add_subdirectory ("modules/imu")
 #add_subdirectory ("modules/motors")
 
