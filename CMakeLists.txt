@@ -70,8 +70,9 @@ endif()
 # find_package(Poco REQUIRED Foundation Util Net DataODBC Data)
 
 include_directories("include")
+include_directories("test")
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
 #set(DB2_INCLUDE_PATH "/opt/ibm/db2/V12.1")
@@ -87,7 +88,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utils/Logger)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/database)
 
-add_executable(Robot src/main.cpp)
+add_executable(Robot src/main.cpp src/robot.cpp
+    src/controllers/odometry.cpp)
 
 #libraries
 #add_subdirectory ("apps/motion_control")
