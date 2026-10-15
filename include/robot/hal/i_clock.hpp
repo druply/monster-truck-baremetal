@@ -6,6 +6,6 @@ namespace robot::hal {
     class IClock {
     public:
         virtual ~IClock() = default;
-        [[nodiscard]] virtual Timestamp now() const noexcept = 0;
+        [[nodiscard]] virtual Timestamp monotonic_time_ms() const noexcept = 0;
     };
 }

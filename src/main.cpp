@@ -6,7 +6,7 @@ int main() {
 
     robot::Result<void> result = robot.initialize();
     if (!result) {
-        std::printf("Failed to initialize robot: %d\n", static_cast<int>(result.error()));
+        std::printf("Failed to initialize robot: \n");
         return 1;
     }
 
