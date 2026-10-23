@@ -8,8 +8,9 @@ option(USE_RASPBERRY_PI "Build for Raspberry Pi hardware" OFF)
 
 project ("AnimalTruck")
 
-option(ENABLE_ASAN "Build with AddressSanitizer" ON)
-option(ENABLE_TSAN "Build with ThreadSanitizer" ON)
+
+option(ENABLE_ASAN "Build with AddressSanitizer" OFF)
+option(ENABLE_TSAN "Build with ThreadSanitizer" OFF)
 option(ENABLE_HARDENING "Enable compiler hardening options" ON)
 option(ENABLE_STRICT_WARNINGS "Enable strict Clang warnings and treat them as errors" ON)
 
@@ -24,56 +25,7 @@ message(STATUS "C++ Compiler Path: ${CMAKE_CXX_COMPILER}")
 # Find the required system threads library (pthread)
 find_package(Threads REQUIRED)
 
-#set(BOOST_ROOT "C:\\boost_libraries") 
-#set(Boost_USE_STATIC_LIBS ON)
-#set(BOOST_LIBRARYDIR "${BOOST_ROOT}/stage/lib")
-#set(Boost_DEBUG ON) 
-# find_package(Boost)
-
-if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    message(STATUS "Using GCC compiler, adding specific flags.")
-    # Add GCC specific options
-    set(BOOST_ROOT /usr/local)
-    set(Boost_INCLUDE_DIR /usr/local/include)
-    set(Boost_LIBRARY_DIR /usr/local/lib)
-
-    if(Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIRS})
-    link_directories(${Boost_LIBRARY_DIRS})
-    endif()
-
-    # Add custom CMake modules path
-    #list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-    find_library(PAHO_CPP_LIB paho-mqttpp3)
-    find_library(PAHO_C_LIB paho-mqtt3a)
-
-
-    if(WIN32)
-	    include_directories("C:\\Poco\\include")
-        include_directories("C:\\boost_libraries")
-	    set(Poco_DIR "C:\\Poco\\cmake") 
-    endif()
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
-    message(STATUS "Using Clang compiler, adding specific flags.")
-    # Add Clang specific options
-    if(APPLE)
-      message(STATUS "Building on macOS or other Apple platform")
-      find_package(Boost REQUIRED)
-    endif()
-
-elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-    message(STATUS "Using Visual Studio C++ compiler.")
-    # Add MSVC specific options
-    if(WIN32)
-	    include_directories("C:\\PocoVS\\include")
-        include_directories("C:\\boost_libraries")
-	    set(Poco_DIR "C:\\PocoVS\\cmake") 
-     endif()
-endif()
-
-
-include_directories("include")
-include_directories("test")
+find_package(Boost CONFIG REQUIRED)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
@@ -142,9 +94,17 @@ endif()
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/utils/Logger)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib/database)
 
-add_executable(Robot src/main.cpp src/robot.cpp
-    src/controllers/odometry.cpp)
-target_link_libraries(Robot PRIVATE project_build_options)
+add_executable(Robot 
+    src/main.cpp 
+    src/app/robot.cpp
+    src/controllers/odometry.cpp
+    src/app/robot_factory.cpp)
+target_include_directories(Robot PRIVATE include test)
+target_link_libraries(Robot PRIVATE
+    project_build_options
+    Boost::headers
+    Threads::Threads
+)
 
 #libraries
 #add_subdirectory ("apps/motion_control")

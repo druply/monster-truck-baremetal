@@ -12,13 +12,13 @@ namespace robot::app
 
     struct Hardware
     {
-        std::unique_ptr<hal::IImu> imu;
+        //std::unique_ptr<hal::IImu> imu;
         std::unique_ptr<hal::IEncoder> left_encoder;
         std::unique_ptr<hal::IEncoder> right_encoder;
-        std::unique_ptr<hal::IMotor> left_motor;
-        std::unique_ptr<hal::IMotor> right_motor;
-        std::unique_ptr<hal::ILidar> lidar;
-        std::shared_ptr<hal::IClock> clock; // shared: many things need time
+        // std::unique_ptr<hal::IMotor> left_motor;
+        // std::unique_ptr<hal::IMotor> right_motor;
+        // std::unique_ptr<hal::ILidar> lidar;
+        // std::shared_ptr<hal::IClock> clock; // shared: many things need time
     };
 
 } // namespace robot::app

@@ -11,6 +11,21 @@ requiring the configured C++23 standard.
 Disable strict warnings temporarily with `-DENABLE_STRICT_WARNINGS=OFF` when
 working through existing diagnostics.
 
+## Conan dependencies
+
+Boost is managed by Conan rather than discovered from platform-specific
+installation paths. Install dependencies, then configure and build with the
+Conan-generated CMake preset:
+
+```sh
+conan install . --build=missing
+cmake --preset conan-release
+cmake --build --preset conan-release
+```
+
+The Conan CMake toolchain and dependency config files are generated under
+`build/Release/generators` and loaded through the included CMake user presets.
+
 ## Sanitizers and compiler hardening
 
 Compiler hardening is enabled by default. GNU and Clang builds use stack
