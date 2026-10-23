@@ -9,6 +9,7 @@ namespace robot::hal {
         virtual ~IEncoder() = default;
         virtual Result<void> initialize() = 0;
         virtual Result<EncoderTick> read() = 0;
+        virtual Result<void> run() = 0;
         [[nodiscard]] virtual bool is_healthy() const noexcept = 0;
     };
 }

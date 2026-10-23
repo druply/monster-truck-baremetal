@@ -30,7 +30,7 @@ namespace robot::controllers
         double m_prev_left_encoder_distance{0};
 
     public:
-        Odometry(hal::IEncoder &left_encoder, hal::IEncoder &right_encoder) : m_left_encoder(left_encoder), m_right_encoder(right_encoder) {}
+        Odometry(hal::IEncoder &left_encoder, hal::IEncoder &right_encoder) : m_right_encoder(right_encoder), m_left_encoder(left_encoder) {}
         void step(void);
     };
 }

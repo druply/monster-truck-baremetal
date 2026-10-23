@@ -6,14 +6,16 @@
 
 namespace robot::drivers {
 
+
 struct Lm393EncoderConfig {
-    std::string gpio_chip{"/dev/gpiochip0"};
+    std::string gpio_chip{"gpiochip0"};
+    std::string line_name{"encoder_right"};
     unsigned int line{17};             // single channel (D0)
 
     // Holes per revolution of the encoder disk.
     // The sensor produces one pulse per hole, per revolution.
     // Common disks: 20 holes.
-    unsigned int holes_per_rev{20};
+    //unsigned int holes_per_rev{20};
 
     // Direction hint provider. Because the LM393 is single-channel,
     // the caller must tell us which way the motor is spinning.
@@ -21,8 +23,8 @@ struct Lm393EncoderConfig {
     // false = forward (positive ticks), true = reverse.
     bool invert{false};
 
-    bool use_bias_pull_up{true};
-    std::uint32_t debounce_ns{0};
+    // bool use_bias_pull_up{true};
+    // std::uint32_t debounce_ns{0};
 };
 
 class Lm393Encoder final : public hal::IEncoder {
@@ -32,6 +34,7 @@ public:
 
     Result<void> initialize() override;
     Result<EncoderTick> read() override;
+    Result<void> run() override;
     [[nodiscard]] bool is_healthy() const noexcept override;
 
     // Called by the control loop to indicate the current motor direction.

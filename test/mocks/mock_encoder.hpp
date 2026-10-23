@@ -15,6 +15,10 @@
             last_ = next_;
             return next_; 
         }
+        robot::Result<void> run() override {
+
+            return {};
+        }
          bool is_healthy() const noexcept override { return healthy_; }
 
 

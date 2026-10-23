@@ -7,12 +7,12 @@ namespace robot::controllers
     {
         double right_encoder_distance = 0;
         double right_encoder_delta_distance = 0;
-        double right_encoder_velocity;
+        [[maybe_unused]] double right_encoder_velocity;
         robot::Timestamp delta_time_encoder_right_local = 0;
 
         double left_encoder_distance = 0;
         double left_encoder_delta_distance = 0;
-        double left_encoder_velocity;
+        [[maybe_unused]] double left_encoder_velocity;
         robot::Timestamp delta_time_encoder_left_local = 0;
 
         robot::Result<robot::EncoderTick> right_tick = m_right_encoder.read();

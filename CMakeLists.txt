@@ -1,12 +1,21 @@
 ﻿# CMakeList.txt : CMake project for LogFile, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.8)
+cmake_minimum_required (VERSION 3.13)
 
 # 1. Add a manual option to override detection if needed
 option(USE_RASPBERRY_PI "Build for Raspberry Pi hardware" OFF)
 
 project ("AnimalTruck")
+
+option(ENABLE_ASAN "Build with AddressSanitizer" ON)
+option(ENABLE_TSAN "Build with ThreadSanitizer" ON)
+option(ENABLE_HARDENING "Enable compiler hardening options" ON)
+option(ENABLE_STRICT_WARNINGS "Enable strict Clang warnings and treat them as errors" ON)
+
+if(ENABLE_ASAN AND ENABLE_TSAN)
+    message(FATAL_ERROR "ENABLE_ASAN and ENABLE_TSAN cannot be enabled together.")
+endif()
 
 message(STATUS "C++ Compiler ID: ${CMAKE_CXX_COMPILER_ID}")
 message(STATUS "C++ Compiler Version: ${CMAKE_CXX_COMPILER_VERSION}")
@@ -62,23 +71,68 @@ elseif (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
      endif()
 endif()
 
-# if(WIN32)
-# find_package(ODBC REQUIRED)
-# endif()
-
-# # Find the POCO package and the necessary components (e.g., Foundation, Util, Net)
-# find_package(Poco REQUIRED Foundation Util Net DataODBC Data)
 
 include_directories("include")
 include_directories("test")
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
-
-#set(DB2_INCLUDE_PATH "/opt/ibm/db2/V12.1")
-#link_directories(${DB2_INCLUDE_PATH}/lib64)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+
+add_library(project_build_options INTERFACE)
+
+if(ENABLE_STRICT_WARNINGS AND CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|AppleClang)$")
+    target_compile_options(project_build_options INTERFACE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Werror
+        -Wconversion
+        -Wsign-conversion
+        -Wshadow
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wnull-dereference
+        -Wdouble-promotion
+        -Wformat=2
+        -Wundef
+    )
+endif()
+
+if(ENABLE_HARDENING)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
+        target_compile_options(project_build_options INTERFACE
+            -fstack-protector-strong
+            "$<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:-D_FORTIFY_SOURCE=2>"
+        )
+    elseif(MSVC)
+        target_compile_options(project_build_options INTERFACE /GS /sdl)
+    endif()
+endif()
+
+if(ENABLE_ASAN OR ENABLE_TSAN)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "^(GNU|Clang|AppleClang)$")
+        if(ENABLE_ASAN)
+            set(SANITIZER_FLAG -fsanitize=address)
+        else()
+            set(SANITIZER_FLAG -fsanitize=thread)
+        endif()
+        target_compile_options(project_build_options INTERFACE
+            ${SANITIZER_FLAG}
+            -fno-omit-frame-pointer
+            -g
+        )
+        target_link_options(project_build_options INTERFACE ${SANITIZER_FLAG})
+    elseif(MSVC AND ENABLE_ASAN)
+        target_compile_options(project_build_options INTERFACE /fsanitize=address)
+        target_link_options(project_build_options INTERFACE /fsanitize=address)
+    else()
+        message(FATAL_ERROR
+            "The requested sanitizer is not supported with ${CMAKE_CXX_COMPILER_ID}.")
+    endif()
+endif()
 
 #db2 library header files
 #include_directories(${DB2_INCLUDE_PATH}/include)
@@ -90,6 +144,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 add_executable(Robot src/main.cpp src/robot.cpp
     src/controllers/odometry.cpp)
+target_link_libraries(Robot PRIVATE project_build_options)
 
 #libraries
 #add_subdirectory ("apps/motion_control")
