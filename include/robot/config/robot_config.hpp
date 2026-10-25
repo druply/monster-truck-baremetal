@@ -1,14 +1,15 @@
 #pragma once
 #include <string>
+#include "robot/config/encoder_config.hpp"
 
-namespace robot::app
+namespace robot::config
 {
 
     struct RobotConfig
     {
         std::string imu;
-        std::string left_encoder;
-        std::string right_encoder;
+        EncoderConfig left_encoder;
+        EncoderConfig right_encoder;
         std::string robot;
     };
 

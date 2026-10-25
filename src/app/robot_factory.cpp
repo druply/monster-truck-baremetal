@@ -12,16 +12,29 @@ namespace robot::app {
 
 Result<std::unique_ptr<Robot>> make_robot_from_config(const std::string& /*path*/) {
     //auto cfg = config::load(path);          // parses YAML into plain structs
-    RobotConfig cfg;
+    robot::config::RobotConfig cfg {
+        .imu = "path/to/imu_config.yaml",
+        .left_encoder = robot::config::EncoderConfig{
+            .gpio_chip = "gpiochip0",
+            .line_name = "encoder_left",
+            .line = 18
+        },
+        .right_encoder = robot::config::EncoderConfig{
+            .gpio_chip = "gpiochip0",
+            .line_name = "encoder_right",
+            .line = 17
+        },
+        .robot = "path/to/robot_config.yaml"
+    };
     //auto clock = std::make_shared<drivers::LinuxClock>();
 
     Hardware hw{
         // .imu = std::make_unique<drivers::Mpu9250Imu>(
         //     cfg.imu, clock),
         .left_encoder = std::make_unique<MockEncoder>(
-            /*cfg.left_encoder*/),
+            cfg.left_encoder),
         .right_encoder = std::make_unique<MockEncoder>(
-            /*cfg.right_encoder*/),
+            cfg.right_encoder),
         // .left_motor = std::make_unique<drivers::Pca9685Motor>(
         //     cfg.left_motor),
         // .right_motor = std::make_unique<drivers::Pca9685Motor>(

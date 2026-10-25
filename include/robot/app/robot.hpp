@@ -14,9 +14,10 @@ namespace robot::app
     class Robot
     {
 
+    Hardware m_hw;
 
     public:
-        Robot(const std::string& /*cfg*/, Hardware&& /*hw*/) {}
+        Robot(const std::string& /*cfg*/, Hardware&& hw) : m_hw(std::move(hw)) {}
         Result<void> initialize();
     };
 

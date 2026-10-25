@@ -3,7 +3,7 @@
 #include <memory>
 #include "robot/app/robot.hpp"
 #include "robot/app/hardware.hpp"
-#include "robot/app/config.hpp"
+#include "robot/config/robot_config.hpp"
 
 namespace robot::app
 {
@@ -14,6 +14,6 @@ namespace robot::app
     Result<std::unique_ptr<Robot>> make_robot_from_config(const std::string &config_path);
 
     // Builds a Robot with mock hardware. Used in CI and on developer laptops.
-    std::unique_ptr<Robot> make_robot_with_hardware(Hardware hw, RobotConfig cfg);
+    std::unique_ptr<Robot> make_robot_with_hardware(Hardware hw, robot::config::RobotConfig cfg);
 
 } // namespace robot::app

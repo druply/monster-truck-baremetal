@@ -26,6 +26,27 @@ cmake --build --preset conan-release
 The Conan CMake toolchain and dependency config files are generated under
 `build/Release/generators` and loaded through the included CMake user presets.
 
+## Debugging with Conan
+
+Generate the Debug Conan toolchain and CMake preset from the repository root:
+
+```sh
+conan install . --build=missing -s build_type=Debug
+```
+
+This creates `build/Debug/generators/CMakePresets.json` with the
+`conan-debug` preset and adds it to `CMakeUserPresets.json`. In VS Code, run
+**CMake: Select Configure Preset**, choose `conan-debug`, select the `Robot`
+build target, and build it with **CMake: Build**. The Debug configuration
+includes debug symbols; the existing `conan-release` preset is optimized and
+is not suitable for source-level debugging.
+
+Install the recommended CodeLLDB extension, then start **Debug Robot (LLDB)**
+from Run and Debug. Its launch profile uses CMake Tools' active launch target,
+so it follows the selected preset and target. Do not use a `cppdbg` profile
+that starts Apple LLDB with `--interpreter=mi`; Apple's LLDB does not support
+that MI option.
+
 ## Sanitizers and compiler hardening
 
 Compiler hardening is enabled by default. GNU and Clang builds use stack
