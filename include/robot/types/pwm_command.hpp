@@ -2,6 +2,6 @@
 
 namespace robot {
     struct PWMCommand {
-        double duty{-1.0};   // normalized [-1, 1]
+        double duty{};   // normalized [0, 1]; direction is controlled separately
     };
 }

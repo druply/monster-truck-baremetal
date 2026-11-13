@@ -1,6 +1,8 @@
 // imu_sample.hpp
 #pragma once
 #include "timestamp.hpp"
+#include <cstdint>
+
 namespace robot
 {
 
@@ -11,9 +13,7 @@ namespace robot
 
     struct ImuSample
     {
-        // Timestamp stamp{};
-        //  timestamp in monotonic seconds (double)
-        uint64_t timestamp;
+        std::uint64_t timestamp{};
         Vec3 accel{}; // m/s^2
         Vec3 gyro{};  // rad/s
         Vec3 mag{};   // µT (optional)

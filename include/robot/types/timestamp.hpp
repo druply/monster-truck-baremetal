@@ -1,9 +1,9 @@
-// imu_sample.hpp
 #pragma once
+#include <cstdint>
 
 namespace robot
 {
-    //using Timestamp = std::chrono::steady_clock::time_point;
-    using Timestamp = uint64_t;
+    // Sensor timestamps use monotonic milliseconds.
+    using Timestamp = std::uint64_t;
 
 }

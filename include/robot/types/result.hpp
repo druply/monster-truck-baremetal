@@ -10,7 +10,8 @@ namespace robot
         Imu,
         Encoder,
         Motor,
-        Lidar
+        Lidar,
+        Runtime
     };
 
     enum class ErrorCode

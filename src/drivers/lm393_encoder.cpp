@@ -4,7 +4,6 @@
 #include <gpiod.h>
 #include <poll.h>
 #include <unistd.h>
-#include <atomic>
 #include <chrono>
 
 namespace robot::drivers
@@ -45,11 +44,10 @@ namespace robot::drivers
     struct Lm393Encoder::Impl
     {
         robot::config::EncoderConfig cfg{};
-        std::atomic<Tick> ticks{0};
-        std::atomic<EncoderTick> last_tick{};
+        Tick ticks{0};
+        EncoderTick last_tick{};
         bool healthy{false};
         gpiod::line line;
-        std::atomic<bool> reverse{false};
         const auto timeout = std::chrono::milliseconds(10);
     };
 
@@ -79,14 +77,17 @@ namespace robot::drivers
         return {};
     }
 
-    std::optional<EncoderTick> Lm393Encoder::read()
+    Result<EncoderTick> Lm393Encoder::read() const
     {
 
         if (!is_healthy())
         {
-            return std::nullopt;
+            return std::unexpected(Error{
+                Module::Encoder,
+                ErrorCode::NotInitialized,
+                "Encoder is not initialized"});
         }
-        return impl_->last_tick.load(std::memory_order_relaxed);
+        return impl_->last_tick;
         // if (impl_->line.event_wait(impl_->timeout))
         // {
         //     auto event = impl_->line.event_read();
@@ -116,16 +117,15 @@ namespace robot::drivers
         if (impl_->line.event_wait(impl_->timeout))
         {
             auto event = impl_->line.event_read();
-            // Atomically increment with relaxed memory order for peak ARM performance
-            impl_->ticks.fetch_add(1, std::memory_order_relaxed);
+            ++impl_->ticks;
 
             const auto event_time = std::chrono::seconds{event.ts.tv_sec} + std::chrono::nanoseconds{event.ts.tv_nsec};
             const auto stamp_ms =
                 std::chrono::duration_cast<std::chrono::milliseconds>(event_time).count();
-            impl_->last_tick.store(EncoderTick{
+            impl_->last_tick = EncoderTick{
                 .stamp = static_cast<Timestamp>(stamp_ms),
-                .ticks = impl_->ticks.load(std::memory_order_relaxed)
-            }, std::memory_order_relaxed);
+                .ticks = impl_->ticks
+            };
             // return EncoderTick{
             //     .stamp = static_cast<Timestamp>(stamp_ms),
             //     .ticks = impl_->ticks.load(std::memory_order_relaxed)};
@@ -148,7 +148,7 @@ namespace robot::drivers
 
     Tick Lm393Encoder::ticks() const noexcept
     {
-        return impl_ ? impl_->ticks.load(std::memory_order_relaxed) : 0;
+        return impl_ ? impl_->ticks : 0;
     }
 
 } // namespace robot::drivers

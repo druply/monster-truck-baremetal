@@ -1,7 +1,6 @@
 // include/robot/drivers/lm393_encoder.hpp
 #pragma once
 #include <memory>
-#include <optional>
 #include <string>
 #include "robot/hal/i_encoder.hpp"
 #include "robot/config/encoder_config.hpp"
@@ -15,8 +14,8 @@ public:
     ~Lm393Encoder() override;
 
     Result<void> initialize() override;
-    std::optional<EncoderTick> read() override;
-    Result<void> run(void) override;
+    [[nodiscard]] Result<EncoderTick> read() const override;
+    Result<void> run() override;
     [[nodiscard]] bool is_healthy() const noexcept override;
 
     // Called by the control loop to indicate the current motor direction.

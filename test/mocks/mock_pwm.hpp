@@ -1,43 +1,41 @@
-// test/mocks/mock_pwm.hpp
-#include "robot/hal/i_pwm.hpp"
-#include "robot/config/pwm_config.hpp"
-#include <cstdio>
-#include <string>
+#pragma once
 
-class MockPWM : public robot::hal::IPWM
+#include "robot/hal/i_pwm.hpp"
+
+class MockPWM final : public robot::hal::IPWM
 {
-    robot::config::PWMConfig m_config;
-    std::string m_duty_path;
+    bool m_healthy{false};
 
 public:
-    explicit MockPWM(const robot::config::PWMConfig &config) : m_config(config) {}
+    robot::PWMCommand last{};
 
     robot::Result<void> initialize() override
     {
-        std::printf("MockPWM initialized\n");
-        m_duty_path = m_config.duty_path + std::to_string(m_config.channel) + "/duty_cycle";
-        std::printf("duty_path: %s\n", m_duty_path.c_str());
+        m_healthy = true;
+        last = {};
         return {};
     }
-    robot::Result<void> set(const robot::PWMCommand &cmd) override
+
+    robot::Result<void> set(const robot::PWMCommand& command) override
     {
-        last_ = cmd;
-        std::printf("MockPWM set to %f\n", last_.duty);
+        if (!m_healthy)
+        {
+            return std::unexpected(robot::Error{
+                robot::Module::Motor,
+                robot::ErrorCode::NotInitialized,
+                "Mock PWM is not initialized"});
+        }
+        last = command;
         return {};
     }
+
     robot::Result<void> turnOn() override
     {
-        std::printf("MockPWM turned on\n");
-        return {};
+        return set(robot::PWMCommand{.duty = 1.0});
     }
 
     robot::Result<void> turnOff() override
     {
-        last_ = {};
-        std::printf("MockPWM turned off\n");
-        return {};
+        return set(robot::PWMCommand{.duty = 0.0});
     }
-
-    robot::PWMCommand last_{};
-
 };

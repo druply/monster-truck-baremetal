@@ -1,51 +1,50 @@
-# monster-truck-baremetal
-Monster truck self driving  rc car
+# Monster Truck Baremetal Robot
 
-## Strict Clang diagnostics
+The project uses C++23. `robot_core` contains hardware-independent odometry,
+`robot_runtime` owns the lifecycle and data flow, and `robot_pca9685` provides
+the Linux I2C output driver. The `Robot` executable currently uses simulated
+devices so it can be built and exercised on a development machine.
 
-Clang and AppleClang builds use strict warnings by default, including conversion,
-shadowing, format, and language-extension diagnostics. Warnings are treated as
-errors. The project also disables compiler-specific C++ extensions while
-requiring the configured C++23 standard.
-
-Disable strict warnings temporarily with `-DENABLE_STRICT_WARNINGS=OFF` when
-working through existing diagnostics.
-
-## Conan dependencies
-
-Boost is managed by Conan rather than discovered from platform-specific
-installation paths. Install dependencies, then configure and build with the
-Conan-generated CMake preset:
+## Build and test
 
 ```sh
-conan install . --build=missing
-cmake --preset conan-release
-cmake --build --preset conan-release
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
+ctest --test-dir build --output-on-failure
+./build/bin/Robot
 ```
 
-The Conan CMake toolchain and dependency config files are generated under
-`build/Release/generators` and loaded through the included CMake user presets.
+## PCA9685 PWM
 
-## Debugging with Conan
+`robot::drivers::Pca9685Pwm` controls one PCA9685 output. Configure the Linux
+I2C device (typically `/dev/i2c-1`), I2C address (typically `0x40`, subject to
+board jumpers), PWM frequency, and channel `0` through `15`. `PWMCommand::duty`
+is a finite normalized value in `[0, 1]`; invalid values return an error rather
+than being silently clamped. Initialization puts that channel into the off
+state, and shutdown attempts to turn it off.
+After initialization, `Robot::set_motor_output` sends a duty command to either
+the configured rear or front output. `Robot::spin_once` shuts down both outputs
+if a sensor, odometry, or actuator operation fails.
 
-Generate the Debug Conan toolchain and CMake preset from the repository root:
+The PCA9685 supplies PWM signals; it does not itself drive or reverse a motor.
+Use a suitable motor driver/H-bridge for motor current and direction control.
+Direction must be controlled through its direction input(s), which can be
+separate GPIOs or separately configured PCA9685 channels. The current PWM
+interface controls only one PWM output and does not implement direction.
 
-```sh
-conan install . --build=missing -s build_type=Debug
-```
+The encoder interface is currently polled synchronously by `Robot::spin_once`,
+so one thread owns each device. Encoder tick counters are unsigned and
+cumulative; reverse-direction counting requires a quadrature encoder or an
+external direction signal. Odometry currently reports wheel distances and
+velocities, not a fused pose.
 
-This creates `build/Debug/generators/CMakePresets.json` with the
-`conan-debug` preset and adds it to `CMakeUserPresets.json`. In VS Code, run
-**CMake: Select Configure Preset**, choose `conan-debug`, select the `Robot`
-build target, and build it with **CMake: Build**. The Debug configuration
-includes debug symbols; the existing `conan-release` preset is optimized and
-is not suitable for source-level debugging.
+## Raspberry Pi notes
 
-Install the recommended CodeLLDB extension, then start **Debug Robot (LLDB)**
-from Run and Debug. Its launch profile uses CMake Tools' active launch target,
-so it follows the selected preset and target. Do not use a `cppdbg` profile
-that starts Apple LLDB with `--interpreter=mi`; Apple's LLDB does not support
-that MI option.
+Build and run the real PCA9685 driver on Linux with I2C enabled and the process
+permitted to access `/dev/i2c-*`. The default executable intentionally remains
+a simulator; production hardware assembly should inject `Pca9685Pwm` instances
+through `robot::app::Hardware`. The PCA9685 channels share one board PWM
+frequency, so configure all output instances on that board consistently.
 
 ## Sanitizers and compiler hardening
 
@@ -53,25 +52,18 @@ Compiler hardening is enabled by default. GNU and Clang builds use stack
 protection, and Release/RelWithDebInfo builds also enable `_FORTIFY_SOURCE=2`.
 MSVC builds use `/GS` and `/sdl`.
 
-Enable AddressSanitizer in its own build directory:
+Use separate build directories for sanitizers:
 
 ```sh
 cmake -S . -B build-asan -DCMAKE_BUILD_TYPE=Debug -DENABLE_ASAN=ON
 cmake --build build-asan
-./build-asan/bin/Robot
-```
+ctest --test-dir build-asan --output-on-failure
 
-Enable ThreadSanitizer in a separate build directory:
-
-```sh
 cmake -S . -B build-tsan -DCMAKE_BUILD_TYPE=Debug -DENABLE_TSAN=ON
 cmake --build build-tsan
-./build-tsan/bin/Robot
+ctest --test-dir build-tsan --output-on-failure
 ```
 
-ASan and TSan cannot be enabled in the same build. They are supported with GCC
-and Clang-family compilers; MSVC supports the ASan option only. Sanitizers find
-some memory errors and data races when the affected code runs, but they do not
-make a program memory-safe or replace tests and code review. Hardware access,
-operating-system support, and the selected compiler/runtime may also limit
-which sanitizer builds can run.
+ASan and TSan cannot be enabled in the same build. Sanitizers find some memory
+errors and data races when affected code runs, but do not replace tests or
+hardware validation.

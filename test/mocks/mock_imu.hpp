@@ -1,20 +1,44 @@
-// test/mocks/mock_imu.hpp
+#pragma once
+
 #include "robot/hal/i_imu.hpp"
 
-class MockImu : public robot::hal::IImu {
-public:
-    robot::Result<void> initialize() override { return {}; }
-    robot::Result<robot::ImuSample> read() override { 
-        //return std::unexpected(robot::Error{robot::Module::Imu, robot::ErrorCode::IoFailure, "Failed to get IMU data"});
-        return next_; 
-    }
-    bool is_healthy() const noexcept override { return healthy_; }
+class MockImu final : public robot::hal::IImu
+{
+    bool m_healthy{false};
 
-    robot::ImuSample next_{
+public:
+    bool fail_read{false};
+    robot::ImuSample next{
         0,
         {0.5, 0.3, 0.7},
         {0.1, 0.2, 0.21},
         {0.0, 0.0, 0.0},
         0.0};
-    bool healthy_{true};
+
+    robot::Result<void> initialize() override
+    {
+        m_healthy = true;
+        return {};
+    }
+
+    robot::Result<robot::ImuSample> read() override
+    {
+        if (!m_healthy)
+        {
+            return std::unexpected(robot::Error{
+                robot::Module::Imu,
+                robot::ErrorCode::NotInitialized,
+                "Mock IMU is not initialized"});
+        }
+        if (fail_read)
+        {
+            return std::unexpected(robot::Error{
+                robot::Module::Imu,
+                robot::ErrorCode::IoFailure,
+                "Mock IMU read failed"});
+        }
+        return next;
+    }
+
+    [[nodiscard]] bool is_healthy() const noexcept override { return m_healthy; }
 };

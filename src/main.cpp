@@ -1,37 +1,44 @@
 #include "robot/app/robot_factory.hpp"
+#include "mocks/mock_encoder.hpp"
+#include "mocks/mock_imu.hpp"
+#include "mocks/mock_pwm.hpp"
+
 #include <chrono>
+#include <cstdio>
 #include <memory>
-#include <print>
 #include <thread>
 
-int main() {
-    // robot::Robot robot;
+int main()
+{
+    robot::app::Hardware hardware{
+        .imu = std::make_unique<MockImu>(),
+        .left_encoder = std::make_unique<MockEncoder>(),
+        .right_encoder = std::make_unique<MockEncoder>(),
+        .rear_motor = std::make_unique<MockPWM>(),
+        .front_motor = std::make_unique<MockPWM>()};
 
-    // robot::Result<void> result = robot.initialize();
-    // if (!result) {
-    //     std::printf("Failed to initialize robot: \n");
-    //     return 1;
-    // }
-
-    robot::Result<std::unique_ptr<robot::app::Robot>> robot_result = robot::app::make_robot_from_config("path/to/config.yaml");
-    
-    if (!robot_result) {
-        std::printf("Failed to create robot from config: %s\n", robot_result.error().message.c_str());
+    auto robot_result = robot::app::make_robot_with_hardware(std::move(hardware));
+    if (!robot_result)
+    {
+        std::fprintf(stderr, "Failed to initialize robot: %s\n", robot_result.error().message.c_str());
         return 1;
     }
 
-     std::this_thread::sleep_for(std::chrono::milliseconds(10));
-    for (int i = 0; i < 10; ++i) {
-        robot::Result<bool> result = robot_result.value()->spin_once();
-        if (!result) {
-            std::printf("Failed to spin robot: %s\n", result.error().message.c_str());
+    for (int iteration = 0; iteration < 10; ++iteration)
+    {
+        if (auto result = (*robot_result)->spin_once(); !result)
+        {
+            std::fprintf(stderr, "Robot loop failed: %s\n", result.error().message.c_str());
             return 1;
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(20));
     }
-       
-    //robot_result.value()->initialize();
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
+    if (auto result = (*robot_result)->shutdown(); !result)
+    {
+        std::fprintf(stderr, "Failed to stop motor outputs: %s\n", result.error().message.c_str());
+        return 1;
+    }
 
     return 0;
 }
