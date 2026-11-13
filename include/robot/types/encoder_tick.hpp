@@ -1,11 +1,12 @@
 // encoder_tick.hpp
 #pragma once
 #include <cstdint>
-#include "robot/types/imu_sample.hpp"  // Timestamp
+#include "robot/types/timestamp.hpp"
 
 namespace robot {
+    using Tick = std::uint64_t; // cumulative, never wraps
     struct EncoderTick {
         Timestamp stamp{};
-        std::int64_t ticks{};   // cumulative, never wraps
+        Tick ticks{};   // cumulative, never wraps
     };
 }

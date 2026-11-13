@@ -1,6 +1,8 @@
 #include "robot/app/robot_factory.hpp"
+#include <chrono>
 #include <memory>
 #include <print>
+#include <thread>
 
 int main() {
     // robot::Robot robot;
@@ -18,7 +20,18 @@ int main() {
         return 1;
     }
 
+     std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    for (int i = 0; i < 10; ++i) {
+        robot::Result<bool> result = robot_result.value()->spin_once();
+        if (!result) {
+            std::printf("Failed to spin robot: %s\n", result.error().message.c_str());
+            return 1;
+        }
+    }
+       
     //robot_result.value()->initialize();
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     return 0;
 }

@@ -97,8 +97,10 @@ endif()
 add_executable(Robot 
     src/main.cpp 
     src/app/robot.cpp
-    src/controllers/odometry.cpp
-    src/app/robot_factory.cpp)
+    src/core/odometry.cpp
+    src/app/robot_factory.cpp
+    src/app/demo.cpp
+    src/drivers/pwm.cpp)
 target_include_directories(Robot PRIVATE include test)
 target_link_libraries(Robot PRIVATE
     project_build_options

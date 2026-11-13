@@ -4,7 +4,7 @@
 #include "robot/types/timestamp.hpp"
 #include <numbers>
 
-namespace robot::controllers
+namespace robot::core
 {
 
     ////// Odometry calibration  /////
@@ -22,15 +22,16 @@ namespace robot::controllers
     class Odometry
     {
 
-        hal::IEncoder &m_right_encoder;
-        hal::IEncoder &m_left_encoder;
+        // robot::EncoderTick &m_right_encoder;
+        // robot::EncoderTick &m_left_encoder;
         robot::Timestamp m_prev_timestamp_encoder_right{0};
         robot::Timestamp m_prev_timestamp_encoder_left{0};
         double m_prev_right_encoder_distance{0};
         double m_prev_left_encoder_distance{0};
 
+        void calculate_encoder_odometry(EncoderTick& right_encoder, EncoderTick& left_encoder);
+
     public:
-        Odometry(hal::IEncoder &left_encoder, hal::IEncoder &right_encoder) : m_right_encoder(right_encoder), m_left_encoder(left_encoder) {}
-        void step(void);
+        void update(EncoderTick& right_encoder, EncoderTick& left_encoder, ImuSample& imu_sample);
     };
 }

@@ -1,8 +1,7 @@
-// motor_command.hpp
 #pragma once
 
 namespace robot {
-    struct MotorCommand {
+    struct PWMCommand {
         double duty{-1.0};   // normalized [-1, 1]
     };
 }
